@@ -71,10 +71,14 @@ def Print(btn):
         printer = win32print.OpenPrinter(printer)
 
         d = GetPrinter(printer, 2)
-        buffer = bytearray(open("PrintFile.pdf", 'rUb').read(),("utf-8"))
-        StartDocPrinter(printer,1,(str(MainPath),None,None))
-        WritePrinter(printer,buffer)
-        EndDocPrinter(printer)
+        win32api.ShellExecute (
+            0,
+            "PrintFile.pdf",
+            '"%s"' %printer),
+            ".",
+            0
+        )
+
         
         if not app.getCheckBox("Keep print options"):
             try:

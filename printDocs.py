@@ -66,22 +66,25 @@ def CreatePdf(path):
     return fail
 def Print(btn):
     global MainPath
-    if not CreatePdf(MainPath):
-        printer = win32print.GetDefaultPrinter()
-        printer = win32print.OpenPrinter(printer)
+    try:
+        if not CreatePdf(MainPath):
+            printer = win32print.GetDefaultPrinter()
+            printer = win32print.OpenPrinter(printer)
 
-        d = GetPrinter(printer, 2)
-        win32api.ShellExecute (0,"print","PrintFile.pdf",'"%s"' %printer,".",0)
-        
-        if not app.getCheckBox("Keep print options"):
-            try:
-                for x in optionBoxes:
-                    app.removeOptionBox(x)
-            except:
-                pass
-            addOptionBoxes()
-            app.setEntryDefault("SearchBar","Search")
-            app.setEntryDefault("AmtBar","Amount")
+            d = GetPrinter(printer, 2)
+            win32api.ShellExecute (0,"print","PrintFile.pdf",'"%s"' %printer,".",0)
+            win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+            if not app.getCheckBox("Keep print options"):
+                try:
+                    for x in optionBoxes:
+                        app.removeOptionBox(x)
+                except:
+                    pass
+                addOptionBoxes()
+                app.setEntryDefault("SearchBar","Search")
+                app.setEntryDefault("AmtBar","Amount")
+    except:
+        app.errorBox("Fatal Error","Please select an item to print")
 def ChoiceSelect(box):
     global MainPath
     temp = list(optionBoxes)
@@ -96,6 +99,9 @@ for x in range(0,27):\
     app.addLabel("r%s"%x,"",x,0)
 
 def CheckPrinterStatus():
+    for x in win32print.EnumPrinters(2):
+        print(x[2])
+
     try:
         printer = win32print.GetDefaultPrinter()
         printer = win32print.OpenPrinter(printer)
@@ -134,6 +140,9 @@ app.setButton("PrintButton","Print")
 app.setButtonPadding("SearchButton",[0,0])
 app.setEntryDefault("SearchBar","Search")
 app.setEntryDefault("AmtBar","Amount")
+
+app.setEntryFunction("SearchBar",Search,"<Enter>")
+app.setEntryFunction("AmtBar",Print,"<Enter>")
 # bottom slice - START the GUI
 app.go()
 
